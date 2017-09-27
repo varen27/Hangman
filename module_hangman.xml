@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hangman" default="compile.module.hangman">
+  <dirname property="module.hangman.basedir" file="${ant.file.module_hangman}"/>
+  
+  <property name="module.jdk.home.hangman" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hangman" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hangman" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hangman" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="hangman.output.dir" value="${module.hangman.basedir}/out/production/Hangman"/>
+  <property name="hangman.testoutput.dir" value="${module.hangman.basedir}/out/test/Hangman"/>
+  
+  <path id="hangman.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hangman.module.production.classpath">
+    <path refid="${module.jdk.classpath.hangman}"/>
+  </path>
+  
+  <path id="hangman.runtime.production.module.classpath">
+    <pathelement location="${hangman.output.dir}"/>
+  </path>
+  
+  <path id="hangman.module.classpath">
+    <path refid="${module.jdk.classpath.hangman}"/>
+    <pathelement location="${hangman.output.dir}"/>
+  </path>
+  
+  <path id="hangman.runtime.module.classpath">
+    <pathelement location="${hangman.testoutput.dir}"/>
+    <pathelement location="${hangman.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hangman">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hangman">
+    <patternset refid="excluded.from.module.hangman"/>
+  </patternset>
+  
+  <path id="hangman.module.sourcepath">
+    <dirset dir="${module.hangman.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.hangman" depends="compile.module.hangman.production,compile.module.hangman.tests" description="Compile module Hangman"/>
+  
+  <target name="compile.module.hangman.production" depends="register.custom.compilers" description="Compile module Hangman; production classes">
+    <mkdir dir="${hangman.output.dir}"/>
+    <javac2 destdir="${hangman.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hangman}/javac">
+      <compilerarg line="${compiler.args.hangman}"/>
+      <bootclasspath refid="hangman.module.bootclasspath"/>
+      <classpath refid="hangman.module.production.classpath"/>
+      <src refid="hangman.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hangman"/>
+    </javac2>
+    
+    <copy todir="${hangman.output.dir}">
+      <fileset dir="${module.hangman.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.hangman.tests" depends="register.custom.compilers,compile.module.hangman.production" description="compile module Hangman; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hangman" description="cleanup module">
+    <delete dir="${hangman.output.dir}"/>
+    <delete dir="${hangman.testoutput.dir}"/>
+  </target>
+</project>
